@@ -1,49 +1,66 @@
 import os
 
-def create_file():
-    name = input("Enter the name of the To Do List file (without extension): ")
-    filepath = input("Enter the directory path where you want to save the file (leave blank for current directory): ")
+def get_path(name, filepath):
     if os.path.exists(filepath):
-        full_path = os.path.join(filepath, f"{name}.txt")
+        return os.path.join(filepath, f"{name}.txt")
+    elif filepath == "":
+        return f"{name}.txt"
     else:
         os.makedirs(filepath)
-        full_path = os.path.join(filepath, f"{name}.txt")
-    with open(f"{full_path}.txt", "w", encoding="utf-8") as file:
+        return os.path.join(filepath, f"{name}.txt")
+
+def create_file():
+    name = input("Enter the name of the file (without extension): ")
+    filepath = input("Enter the directory path where you want to save the file (leave blank for current directory): ")
+    full_path = get_path(name, filepath)
+    with open(f"{full_path}", "w", encoding="utf-8") as file:
         pass
-    print("To Do List file created successfully.\n")
+    print("File created successfully.\n")
+
+def show_task():
+    name = input("Enter the name of the file (without extension): ")
+    filepath = input("Enter the directory path where the file is located (leave blank for current directory): ")
+    full_path = get_path(name, filepath)
+    display_tasks(full_path)
+    return full_path
+
+def display_tasks(full_path):
+    with open(f"{full_path}", "r", encoding="utf-8") as file:
+        tasks = file.readlines()
+    if tasks:
+        print("Tasks:")
+        for index, task in enumerate(tasks):
+            print(f"{index + 1}. {task.strip()}")
+        print()
+    else:
+        print("No tasks found.\n")
 
 def add_task():
-    name = input("Enter the name of the To Do List file (without extension): ")
-    total_tasks = int(input("Enter the number of tasks you want to add: "))
-    with open(f"{name}.txt", "a", encoding="utf-8") as file:
+    name = input("Enter the name of the file (without extension): ")
+    filepath = input("Enter the directory path where the file is located (leave blank for current directory): ")
+    full_path = get_path(name, filepath)
+    total_tasks = int(input("Enter the number of tasks you want to add (number only): "))
+    with open(f"{full_path}", "a", encoding="utf-8") as file:
         for i in range(total_tasks):
             task = input(f"Enter task {i + 1}: ")
             file.write(f"{task} [ ]\n")
-
-def show_task():
-    name = input("Enter the name of the To Do List file (without extension): ")
-    with open(f"{name}.txt", "r", encoding="utf-8") as file:
-        tasks = file.readlines()
-    print("Current Tasks:")
-    for index, task in enumerate(tasks):
-        print(f"{index + 1}. {task.strip()}")
+    print("Tasks added successfully.\n")
 
 def update_task():
-    name = input("Enter the name of the To Do List file (without extension): ")
-    show_task()
-    task_number = int(input("Enter the task number to mark as completed: "))
-    with open(f"{name}.txt", "r", encoding="utf-8") as file:
+    full_path = show_task()
+    task_number = int(input("Enter the task number to mark as completed (number only): "))
+    with open(f"{full_path}", "r", encoding="utf-8") as file:
         tasks = file.readlines()
     
     if 0 < task_number <= len(tasks):
         tasks[task_number - 1] = tasks[task_number - 1].replace("[ ]", "[\u2713]")
-        with open(f"{name}.txt", "w", encoding="utf-8") as file:
+        with open(f"{full_path}", "w", encoding="utf-8") as file:
             file.writelines(tasks)
         print("Task marked as completed.\n")
     else:
-        print("Input Invalid")
+        print("Input Invalid\n")
 
-def list_files():
+
 while True:
     print("=========================================")
     print("Welcome to the To Do List Program")
@@ -52,7 +69,10 @@ while True:
     print("3. Show Tasks")
     print("4. Update Task")
     print("5. Exit")
+    print("=========================================")
     choice = int(input("Enter your choice: "))
+    print()
+
 
     if choice == 1:
         create_file()
@@ -66,5 +86,5 @@ while True:
         print("Exiting the program.")
         break
     else:
-        print("Invalid choice. Please try again.")
+        print("Invalid choice. Please try again.\n")
         
